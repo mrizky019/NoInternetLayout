@@ -1,11 +1,11 @@
 package com.mr.nointernetlayout
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
-import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import com.wessam.library.NetworkChecker
 import com.wessam.library.NoInternetLayout
+import org.jetbrains.anko.toast
 
 class MainActivity : AppCompatActivity() {
 
@@ -13,26 +13,30 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        val button =findViewById<Button>(R.id.internet)
-        button.setOnClickListener{
-            isConnectionStable()
+        if (isNetworkConnected()) {
+            var button = findViewById<Button>(R.id.internet)
+            button.setOnClickListener {
+                if (isNetworkConnected()) {
+                    toast("Network stable")
+                } else {
+                    showNotConnected()
+                }
+            }
+        } else {
+            showNotConnected()
         }
     }
 
-    fun isConnectionStable(){
-        try {
-            if(NetworkChecker.isNetworkConnected(this@MainActivity)){
-                Toast.makeText(this@MainActivity, "Network stable",Toast.LENGTH_SHORT).show()
-            } else {
-                NoInternetLayout.Builder(this,  R.layout.activity_main)
-                    .animate()
-                    .mainTitle("No Internet Connection")
-                    .secondaryText("Please check your connetion")
-                    .buttonText("Retry")
-                    .setImage(R.drawable.animated1)
-            }
-        } catch (e : Exception){
-            null
-        }
+    private fun isNetworkConnected(): Boolean {
+        return NetworkChecker.isNetworkConnected(this@MainActivity)
+    }
+
+    private fun showNotConnected() {
+        NoInternetLayout.Builder(this, R.layout.activity_main)
+            .animate()
+            .mainTitle("No Internet Connection")
+            .secondaryText("Please check your connetion")
+            .buttonText("Retry")
+            .setImage(R.drawable.animated1)
     }
 }
